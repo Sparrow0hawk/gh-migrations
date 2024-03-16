@@ -26,14 +26,12 @@ jobs:
 
       - name: Run Flyway migrations
         run: |
-          tail -n +1 /home/runner/work/_temp/*
-          
           docker run --rm \
             --network=host \
             -e FLYWAY_URL=jdbc:postgresql://127.0.0.1:5432/gh-migration \
             -e FLYWAY_USER=migration \
-            -e FLYWAY_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+            -e 'FLYWAY_PASSWORD=${{ secrets.DATABASE_PASSWORD }}' \
             -e FLYWAY_CLEAN_DISABLED \
-            -v ${{ github.workspace }}/sql:/flyway/sql \
-            flyway/flyway:10.10R \
+            -v '${{ github.workspace }}/sql:/flyway/sql' \
+            flyway/flyway:10.10 \
             migrate
