@@ -1,0 +1,35 @@
+name: 'Deploy'
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS_DEPLOY }}'
+
+      - name: Start Cloud SQL Auth Proxy
+        run: |
+          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.7.0/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
+          nohup ./cloud-sql-proxy ${{ secrets.DATABASE_CONNECTION_NAME }} > cloud-sql-proxy.out 2> cloud-sql-proxy.err < /dev/null &
+
+      - name: Run Flyway migrations
+        run: |
+          docker run --rm \
+            --network=host \
+            -e FLYWAY_URL=jdbc:postgresql://127.0.0.1:5432/gh-migration \
+            -e FLYWAY_USER=migration \
+            -e FLYWAY_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+            -e FLYWAY_CLEAN_DISABLED \
+            -v ${{ github.workspace }}/sql:/flyway/sql \
+            flyway/flyway:10.10R \
+            migrate

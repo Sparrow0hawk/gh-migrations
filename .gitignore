@@ -1,5 +1,6 @@
 # Terraform
 .terraform/
+*.tfstate*
 
 # PyCharm
 /.idea/
