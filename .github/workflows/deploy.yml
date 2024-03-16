@@ -22,6 +22,10 @@ jobs:
           chmod +x cloud-sql-proxy
           nohup ./cloud-sql-proxy ${{ secrets.DATABASE_CONNECTION_NAME }} > cloud-sql-proxy.out 2> cloud-sql-proxy.err < /dev/null &
 
+      - name: Expose folder
+        run: |
+          tail -n +1 /home/runner/work/_temp/*
+
       - name: Run Flyway migrations
         run: |
           docker run --rm \
