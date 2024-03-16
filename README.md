@@ -29,3 +29,14 @@ To use this repository you will need:
       ```bash
       terraform -chdir=cloud output github_action_private_key
       ```
+### Testing migrations locally
+
+1. Test migrations locally using Docker compose:
+   ```bash
+   docker compose up
+   ```
+
+2. Tidy up containers (deleting all data)
+   ```bash
+   docker compose down
+   ```
